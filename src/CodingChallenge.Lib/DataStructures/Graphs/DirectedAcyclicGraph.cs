@@ -7,9 +7,17 @@ using System.Threading.Tasks;
 
 namespace CodingChallenge.Lib.DataStructures.Graphs
 {
-    public sealed partial class DirectedAcyclicGraph<T> : IDirectedAcyclicGraph<T>
+    public sealed class DirectedAcyclicGraph<T> : IDirectedAcyclicGraph<T>
     {
         private readonly List<GraphVertex<T>> _graphAdjacencyList = new List<GraphVertex<T>>();
+
+        internal IReadOnlyList<GraphVertex<T>> GraphAdjacencyList
+        {
+            get
+            {
+                return _graphAdjacencyList;
+            }
+        }
 
         public DirectedAcyclicGraph(T headNodeLabel)
         {
@@ -17,7 +25,7 @@ namespace CodingChallenge.Lib.DataStructures.Graphs
             {
                 throw new ArgumentNullException(nameof(headNodeLabel));
             }
-            _graphAdjacencyList.Add(new GraphVertex<T>(headNodeLabel));
+            _graphAdjacencyList.Add(new GraphVertex<T>(headNodeLabel, 0));
         }
 
         public void AddEdge(GraphNode<T> fromNode, GraphNode<T> toNode)
@@ -31,14 +39,16 @@ namespace CodingChallenge.Lib.DataStructures.Graphs
                 throw new ArgumentOutOfRangeException(nameof(fromNode));
             }
             var fromVertex = _graphAdjacencyList[fromNode.NodeIndex.Value];
-            _graphAdjacencyList.Add(new GraphVertex<T>(toNode.NodeLabel));
-            var toNodeIndex = _graphAdjacencyList.Count - 1;
-            fromVertex.AddAdjacentVertexIndex(toNode.NodeLabel, toNodeIndex);
+            var toVertex = new GraphVertex<T>(toNode.NodeLabel);
+            _graphAdjacencyList.Add(toVertex);
+            var toVertexIndex = _graphAdjacencyList.Count - 1;
+            toVertex.VertexIndex = toVertexIndex;
+            fromVertex.AddAdjacentVertexIndex(toVertex.VertexLabel, toVertexIndex);
         }
 
         public IDirectedAcyclicGraphDepthFirstTraversor<T> GetDepthFirstEnumerator()
         {
-            return this;
+            return new DirectedAcyclicGraphDepthFirstTraversor<T>(this);
         }
     }
 }

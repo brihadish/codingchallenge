@@ -10,8 +10,10 @@ namespace CodingChallenge.Lib.DataStructures.Graphs
     {
         GraphNode<T> Current { get; }
 
-        bool MoveNext();
+        bool MoveNext(Func<T, bool> adjacentVertexSelector = null);
 
         void Reset();
+
+        void Checkpoint();
     }
 }

@@ -8,9 +8,9 @@ namespace CodingChallenge.Lib.DataStructures.Graphs
     {
         public Maybe<int> NodeIndex { get; }
 
-        public T NodeLabel { get; }
+        public T NodeLabel { get; }        
 
-        public Maybe<IEnumerable<GraphNode<T>>> AdjacentNodes { get; }
+        public Maybe<bool> IsLeaf { get; }
 
         private GraphNode(T nodeLabel)
         {
@@ -21,23 +21,23 @@ namespace CodingChallenge.Lib.DataStructures.Graphs
             }
             NodeIndex = Maybe<int>.Nothing;
             NodeLabel = nodeLabel;
-            AdjacentNodes = Maybe<IEnumerable<GraphNode<T>>>.Nothing;
+            IsLeaf = Maybe<bool>.Nothing;
         }
 
-        public GraphNode(int nodeIndex, T nodeLabel, IEnumerable<GraphNode<T>> adjacentNodes)
+        public GraphNode(int nodeIndex, T nodeLabel, bool isLeaf)
         {
             var maybeT = nodeLabel.ToMaybe();
             if (maybeT.HasValue == false)
             {
                 throw new ArgumentNullException(nameof(nodeLabel));
             }
-            if (nodeIndex <= 0)
+            if (nodeIndex < 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(nodeIndex));
             }
             NodeIndex = nodeIndex.ToMaybe();
             NodeLabel = nodeLabel;
-            AdjacentNodes = adjacentNodes.ToMaybe();
+            IsLeaf = isLeaf.ToMaybe();
         }
 
         public static GraphNode<T> CreateNew(T nodeLabel)
