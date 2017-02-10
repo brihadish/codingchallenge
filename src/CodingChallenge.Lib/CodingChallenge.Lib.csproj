@@ -36,6 +36,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -45,6 +46,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataStructures\Graphs\DirectedAcyclicGraphDepthFirstTraversor.cs" />
+    <Compile Include="DataStructures\ITrie.cs" />
+    <Compile Include="DataStructures\TrieSearchInput.cs" />
+    <Compile Include="DataStructures\TrieSearchOutput.cs" />
+    <Compile Include="Domain\LocationIndex.cs" />
+    <Compile Include="Error.cs" />
     <Compile Include="DataStructures\Graphs\IDirectedAcyclicGraphDepthFirstTraversor.cs" />
     <Compile Include="DataStructures\Graphs\DirectedAcyclicGraph.cs" />
     <Compile Include="DataStructures\Graphs\GraphVertex.cs" />
@@ -52,9 +58,14 @@
     <Compile Include="DataStructures\Graphs\GraphNode.cs" />
     <Compile Include="DataStructures\StringTrie.cs" />
     <Compile Include="Domain\ZipCodeIndex.cs" />
-    <Compile Include="Domain\IZipCodeIndexFactory.cs" />
-    <Compile Include="Infrastructure\IZipCodeIndexRepository.cs" />
+    <Compile Include="Infrastructure\InMemoryStringTrieSerializer.cs" />
+    <Compile Include="Infrastructure\IStringTrieSerializer.cs" />
+    <Compile Include="LocationErrorType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Result.cs" />
+    <Compile Include="TrieErrorType.cs" />
+    <Compile Include="TrieSerializerErrorType.cs" />
+    <Compile Include="ZipCodeErrorType.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

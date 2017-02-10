@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CodingChallenge.Lib.Infrastructure
+namespace CodingChallenge.Lib
 {
-    interface IZipCodeIndexRepository
+    public enum TrieSerializerErrorType
     {
+        StreamMismatch
     }
 }

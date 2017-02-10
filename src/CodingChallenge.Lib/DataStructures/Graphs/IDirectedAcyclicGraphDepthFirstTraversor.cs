@@ -15,5 +15,7 @@ namespace CodingChallenge.Lib.DataStructures.Graphs
         void Reset();
 
         void Checkpoint();
+
+        IEnumerable<GraphNode<T>> CurrentPath { get; }
     }
 }

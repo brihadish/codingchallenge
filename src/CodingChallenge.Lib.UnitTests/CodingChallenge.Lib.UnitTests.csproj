@@ -72,8 +72,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="LocationIndexTests.cs" />
     <Compile Include="StringTrieTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ZipCodeIndexTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CodingChallenge.Lib\CodingChallenge.Lib.csproj">

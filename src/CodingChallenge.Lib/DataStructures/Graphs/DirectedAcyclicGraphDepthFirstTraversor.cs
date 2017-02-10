@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Functional.Maybe;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,7 @@ namespace CodingChallenge.Lib.DataStructures.Graphs
     public sealed class DirectedAcyclicGraphDepthFirstTraversor<T> : IDirectedAcyclicGraphDepthFirstTraversor<T>
     {
         private int _currentIndex = -1;
+        private Maybe<int> _checkpointedRootIndex;
         private Stack<int> _previousIndexes = new Stack<int>();
         private GraphVertex<T> _current;
         private List<int> _traversedIndexes = new List<int>();
@@ -32,6 +34,24 @@ namespace CodingChallenge.Lib.DataStructures.Graphs
                 return new GraphNode<T>(
                                 _currentIndex, 
                                 _current.VertexLabel, 
+                                _current.AdjacentVertices.Count == 0 ? true : false);
+            }
+        }
+
+        public IEnumerable<GraphNode<T>> CurrentPath
+        {
+            get
+            {
+                foreach(var index in _previousIndexes.Reverse())
+                {
+                    yield return new GraphNode<T>(
+                        index, 
+                        _graph.GraphAdjacencyList[index].VertexLabel, 
+                        _graph.GraphAdjacencyList[index].AdjacentVertices.Count == 0 ? true : false);
+                }
+                yield return new GraphNode<T>(
+                                _currentIndex,
+                                _current.VertexLabel,
                                 _current.AdjacentVertices.Count == 0 ? true : false);
             }
         }
@@ -86,12 +106,13 @@ namespace CodingChallenge.Lib.DataStructures.Graphs
         public void Reset()
         {
             _currentIndex = -1;
+            _checkpointedRootIndex = Maybe<int>.Nothing;
             _previousIndexes.Clear();
         }
 
         public void Checkpoint()
         {
-            _previousIndexes.Clear();
+            _checkpointedRootIndex = _currentIndex.ToMaybe();
         }
 
         private void DetermineNextVertex()
@@ -104,11 +125,16 @@ namespace CodingChallenge.Lib.DataStructures.Graphs
             {
                 var index = _previousIndexes.Pop();
                 _current = _graph.GraphAdjacencyList[index];
+                _currentIndex = index;
+                if(_checkpointedRootIndex.SelectOrElse(t => t, () => -1) == index)
+                {
+                    return;
+                }
                 foreach (var vertex in _current.AdjacentVertices)
                 {
                     if (_traversedIndexes.Contains(vertex.Item2) == false)
                     {
-                        break;
+                        return;
                     }
                 }
             }

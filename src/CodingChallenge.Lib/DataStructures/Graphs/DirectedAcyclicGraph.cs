@@ -28,6 +28,11 @@ namespace CodingChallenge.Lib.DataStructures.Graphs
             _graphAdjacencyList.Add(new GraphVertex<T>(headNodeLabel, 0));
         }
 
+        internal DirectedAcyclicGraph(List<GraphVertex<T>> graphAdjacencyList)
+        {
+            _graphAdjacencyList = graphAdjacencyList;
+        }
+
         public void AddEdge(GraphNode<T> fromNode, GraphNode<T> toNode)
         {
             if(fromNode.NodeIndex.HasValue == false)

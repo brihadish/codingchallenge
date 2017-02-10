@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CodingChallenge.Lib.Domain
+namespace CodingChallenge.Lib
 {
-    public interface IZipCodeIndexFactory
+    public enum TrieErrorType
     {
+        EmptySearchValue,
+        IndexMismatch
     }
 }
