@@ -233,5 +233,22 @@ namespace CodingChallenge.Lib.UnitTests
             results.Contains("acef").Should().BeTrue();
             results.Contains("adef").Should().BeTrue();
         }
+
+        [Test]
+        public void should_get_approximate_size_of_trie()
+        {
+            // Arrange
+            var trie = new StringTrie(new DirectedAcyclicGraph<char>('a'), StringComparison.OrdinalIgnoreCase);
+
+            // Act
+            var addResult1 = trie.AddIndex("abcd");
+            var addResult2 = trie.AddIndex("abef");
+            var addResult3 = trie.AddIndex("acef");
+            var addResult4 = trie.AddIndex("adef");
+            var sizeInBytes = trie.ApproximateSizeInBytes;
+
+            // Assert
+            sizeInBytes.Should().NotBe(0);
+        }
     }
 }
