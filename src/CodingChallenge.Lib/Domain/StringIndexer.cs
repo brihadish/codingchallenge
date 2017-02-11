@@ -9,10 +9,12 @@ namespace CodingChallenge.Lib.Domain
     public sealed class StringIndexer : IStringIndexer
     {
         private readonly IStringIndexCache _cache;
+        private readonly bool _isCaseSensitive;
 
-        public StringIndexer(IStringIndexCache cache)
+        public StringIndexer(IStringIndexCache cache, bool isCaseSensitive)
         {
             _cache = cache;
+            _isCaseSensitive = isCaseSensitive;
         }
 
         public async Task<Result> AddIndexAsync(string indexValue)
@@ -30,13 +32,13 @@ namespace CodingChallenge.Lib.Domain
                 SimpleStringIndexCacheErrorType errorType;
                 if (Enum.TryParse(trieResult.Error.ErrorType, out errorType))
                 {
-                    if (errorType == SimpleStringIndexCacheErrorType.UnableToParseTrie)
+                    if (errorType == SimpleStringIndexCacheErrorType.UnableToDeserializeTrie)
                     {
                         return Result.Failure(Error.CreateFromEnum(StringIndexerErrorType.IndexDataNotReadable));
                     }
                     else if (errorType == SimpleStringIndexCacheErrorType.TrieNotFound)
                     {
-                        var newTrieResult = NonEmptyRootStringTrie.CreateNew(indexValue);
+                        var newTrieResult = NonEmptyRootStringTrie.CreateNew(indexValue, _isCaseSensitive);
                         if (newTrieResult.IsFailure)
                         {
                             return Result.Failure(Error.CreateFromEnum(StringIndexerErrorType.UnableToCreateNewIndex));
@@ -89,7 +91,7 @@ namespace CodingChallenge.Lib.Domain
                 SimpleStringIndexCacheErrorType errorType;
                 if (Enum.TryParse(trieResult.Error.ErrorType, out errorType))
                 {
-                    if (errorType == SimpleStringIndexCacheErrorType.UnableToParseTrie)
+                    if (errorType == SimpleStringIndexCacheErrorType.UnableToDeserializeTrie)
                     {
                         return Result<StringIndexerSearchOutput>.Failure(Error.CreateFromEnum(StringIndexerErrorType.IndexDataNotReadable));
                     }

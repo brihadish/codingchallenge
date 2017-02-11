@@ -11,6 +11,7 @@ namespace CodingChallenge.Lib.DataStructures
     internal sealed class NonEmptyRootStringTrie : ITrie<string>
     {
         private readonly IDirectedAcyclicGraph<UnicodeCharacter> _graph;
+        private readonly bool _isCaseSensitive;
 
         public long ApproximateSizeInBytes
         {
@@ -22,25 +23,26 @@ namespace CodingChallenge.Lib.DataStructures
             }
         }
 
-        public NonEmptyRootStringTrie(IDirectedAcyclicGraph<UnicodeCharacter> graph)
+        public NonEmptyRootStringTrie(IDirectedAcyclicGraph<UnicodeCharacter> graph, bool isCaseSensitive)
         {
             if (graph == null)
             {
                 throw new ArgumentNullException(nameof(graph));
             }
             _graph = graph;
+            _isCaseSensitive = isCaseSensitive;
         }
 
-        public static Result<NonEmptyRootStringTrie> CreateNew(string firstIndexValue)
+        public static Result<NonEmptyRootStringTrie> CreateNew(string firstIndexValue, bool isCaseSensitive)
         {
-            var firstChar = firstIndexValue.FirstCharacter();
+            var firstChar = firstIndexValue.FirstCharacter(isCaseSensitive);
             if (firstChar.IsNothing())
             {
                 return Result<NonEmptyRootStringTrie>.Failure(Error.CreateFromEnum(TrieErrorType.EmptyIndexValue));
             }
 
             var graph = new DirectedAcyclicGraph<UnicodeCharacter>(firstChar.Value);
-            var trie = new NonEmptyRootStringTrie(graph);
+            var trie = new NonEmptyRootStringTrie(graph, isCaseSensitive);
             return Result<NonEmptyRootStringTrie>.Ok(trie);
         }
 
@@ -55,7 +57,7 @@ namespace CodingChallenge.Lib.DataStructures
             {
                 // Does the value's first character match the head vertex?
                 var firstCharInGraph = traversor.Current;
-                var firstCharInIndexValue = new UnicodeCharacter(indexValue.FirstOrDefault());
+                var firstCharInIndexValue = new UnicodeCharacter(indexValue.FirstOrDefault(), _isCaseSensitive);
                 if (firstCharInGraph.NodeLabel.Equals(firstCharInIndexValue) == false)
                 {
                     return Result<bool>.Failure(Error.CreateFromEnum(TrieErrorType.IndexMismatch));
@@ -66,7 +68,7 @@ namespace CodingChallenge.Lib.DataStructures
             int index = 1; // Start from second character since the first one will be same as head vertex.
             for (; index < indexValueLength; index++)
             {
-                var indexValueChar = new UnicodeCharacter(indexValue[index]);
+                var indexValueChar = new UnicodeCharacter(indexValue[index], _isCaseSensitive);
                 bool found = traversor.MoveNext(t => t.Equals(indexValueChar));
                 if (found == false)
                 {
@@ -79,7 +81,7 @@ namespace CodingChallenge.Lib.DataStructures
                 for (; index < indexValueLength; index++)
                 {
                     var current = traversor.Current;
-                    var indexValueChar = new UnicodeCharacter(indexValue[index]);
+                    var indexValueChar = new UnicodeCharacter(indexValue[index], _isCaseSensitive);
                     _graph.AddEdge(current, GraphNode<UnicodeCharacter>.CreateNew(indexValueChar));
                     traversor.MoveNext(t => t.Equals(indexValueChar));
                 }
@@ -102,7 +104,7 @@ namespace CodingChallenge.Lib.DataStructures
             {
                 // Does the value's first character match the head vertex?
                 var firstCharInGraph = traversor.Current;
-                var firstCharInSearchValue = new UnicodeCharacter(searchValue.FirstOrDefault());
+                var firstCharInSearchValue = new UnicodeCharacter(searchValue.FirstOrDefault(), _isCaseSensitive);
                 if (firstCharInGraph.NodeLabel.Equals(firstCharInSearchValue) == false)
                 {
                     return Result<TrieSearchOutput<string>>.Failure(Error.CreateFromEnum(TrieErrorType.IndexMismatch));
@@ -114,7 +116,7 @@ namespace CodingChallenge.Lib.DataStructures
             int index = 1;// Start from second character since the first one will be same as head vertex.
             for (; index < searchValueLength; index++)
             {
-                var searchValueChar = new UnicodeCharacter(searchValue[index]);
+                var searchValueChar = new UnicodeCharacter(searchValue[index], _isCaseSensitive);
                 bool found = traversor.MoveNext(t => t.Equals(searchValueChar));
                 if (found == false)
                 {
@@ -130,7 +132,8 @@ namespace CodingChallenge.Lib.DataStructures
             {
                 if (searchInput.ContinuationToken.IsSomething())
                 {
-                    if (string.Equals(searchInput.ContinuationToken.Value, searchValue, StringComparison.Ordinal) == false)
+                    var comparison = _isCaseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
+                    if (string.Equals(searchInput.ContinuationToken.Value, searchValue, comparison) == false)
                     {
                         // Reached end of traversal, hence return.
                         searchResults.Add(searchValue);
@@ -161,7 +164,8 @@ namespace CodingChallenge.Lib.DataStructures
                         }
                         else
                         {
-                            if (searchInput.ContinuationToken.Value.Equals(searchResultValue, StringComparison.Ordinal))
+                            var comparison = _isCaseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
+                            if (searchInput.ContinuationToken.Value.Equals(searchResultValue, comparison))
                             {
                                 canAddToResultset = true;
                             }

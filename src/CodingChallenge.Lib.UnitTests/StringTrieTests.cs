@@ -14,7 +14,7 @@ namespace CodingChallenge.Lib.UnitTests
         public void should_index_new_string_and_retrieve_it_also_type_1()
         {
             // Arrange
-            var trie = new NonEmptyRootStringTrie(new DirectedAcyclicGraph<UnicodeCharacter>(new UnicodeCharacter('a')));
+            var trie = new NonEmptyRootStringTrie(new DirectedAcyclicGraph<UnicodeCharacter>(new UnicodeCharacter('a', false)), false);
 
             // Act
             var addResult1 = trie.AddIndex("abcd");
@@ -41,7 +41,7 @@ namespace CodingChallenge.Lib.UnitTests
         public void should_index_new_string_and_retrieve_it_also_type_2()
         {
             // Arrange
-            var trie = new NonEmptyRootStringTrie(new DirectedAcyclicGraph<UnicodeCharacter>(new UnicodeCharacter('a')));
+            var trie = new NonEmptyRootStringTrie(new DirectedAcyclicGraph<UnicodeCharacter>(new UnicodeCharacter('a', false)), false);
 
             // Act
             var addResult1 = trie.AddIndex("abcd");
@@ -66,7 +66,7 @@ namespace CodingChallenge.Lib.UnitTests
         public void should_index_new_string_and_retrieve_it_also_type_3()
         {
             // Arrange
-            var trie = new NonEmptyRootStringTrie(new DirectedAcyclicGraph<UnicodeCharacter>(new UnicodeCharacter('a')));
+            var trie = new NonEmptyRootStringTrie(new DirectedAcyclicGraph<UnicodeCharacter>(new UnicodeCharacter('a', false)), false);
 
             // Act
             var addResult1 = trie.AddIndex("abcd");
@@ -90,7 +90,7 @@ namespace CodingChallenge.Lib.UnitTests
         public void should_return_empty_if_search_string_is_not_found()
         {
             // Arrange
-            var trie = new NonEmptyRootStringTrie(new DirectedAcyclicGraph<UnicodeCharacter>(new UnicodeCharacter('a')));
+            var trie = new NonEmptyRootStringTrie(new DirectedAcyclicGraph<UnicodeCharacter>(new UnicodeCharacter('a', false)), false);
 
             // Act
             var addResult1 = trie.AddIndex("abcd");
@@ -105,7 +105,7 @@ namespace CodingChallenge.Lib.UnitTests
         public void should_support_pagination_1()
         {
             // Arrange
-            var trie = new NonEmptyRootStringTrie(new DirectedAcyclicGraph<UnicodeCharacter>(new UnicodeCharacter('a')));
+            var trie = new NonEmptyRootStringTrie(new DirectedAcyclicGraph<UnicodeCharacter>(new UnicodeCharacter('a', false)), false);
 
             // Act
             var addResult1 = trie.AddIndex("abcd");
@@ -131,7 +131,7 @@ namespace CodingChallenge.Lib.UnitTests
         public void should_support_pagination_with_continuation_token()
         {
             // Arrange
-            var trie = new NonEmptyRootStringTrie(new DirectedAcyclicGraph<UnicodeCharacter>(new UnicodeCharacter('a')));
+            var trie = new NonEmptyRootStringTrie(new DirectedAcyclicGraph<UnicodeCharacter>(new UnicodeCharacter('a', false)), false);
 
             // Act
             var addResult1 = trie.AddIndex("abcd");
@@ -161,7 +161,7 @@ namespace CodingChallenge.Lib.UnitTests
         public void should_support_pagination_with_continuation_token_1()
         {
             // Arrange
-            var trie = new NonEmptyRootStringTrie(new DirectedAcyclicGraph<UnicodeCharacter>(new UnicodeCharacter('a')));
+            var trie = new NonEmptyRootStringTrie(new DirectedAcyclicGraph<UnicodeCharacter>(new UnicodeCharacter('a', false)), false);
 
             // Act
             var addResult1 = trie.AddIndex("abcd");
@@ -186,54 +186,11 @@ namespace CodingChallenge.Lib.UnitTests
             nextResult1.ResultValue.ContinuationToken.Should().BeNullOrEmpty();
         }
 
-        //[Test]
-        //public void should_serialize_and_deserialize()
-        //{
-        //    // Arrange
-        //    var trie = new NonEmptyRootStringTrie(new DirectedAcyclicGraph<UnicodeCharacter>(new UnicodeCharacter('a')));
-        //    var serializer = new InMemoryStringTrieSerializer();
-
-        //    // Act
-        //    var addResult1 = trie.AddIndex("abcd");
-        //    var addResult2 = trie.AddIndex("abef");
-        //    var addResult3 = trie.AddIndex("acef");
-        //    var addResult4 = trie.AddIndex("adef");
-        //    addResult1.IsSuccess.Should().BeTrue();
-        //    addResult2.IsSuccess.Should().BeTrue();
-        //    addResult3.IsSuccess.Should().BeTrue();
-        //    addResult4.IsSuccess.Should().BeTrue();
-        //    byte[] serializedContent = null;
-        //    using(var ms = new MemoryStream())
-        //    {
-        //        var sresult = serializer.Serialize(trie, ms);
-        //        sresult.IsSuccess.Should().BeTrue();
-        //        serializedContent = ms.ToArray();
-        //    }
-
-        //    NonEmptyRootStringTrie deserializedTrie = null;
-        //    using (var ms = new MemoryStream(serializedContent))
-        //    {
-        //        var dresult = serializer.Deserialize(ms, StringComparison.OrdinalIgnoreCase);
-        //        dresult.IsSuccess.Should().BeTrue();
-        //        deserializedTrie = dresult.ResultValue;
-        //    }
-        //    var result = deserializedTrie.Search(TrieSearchInput<string>.Create("a"));
-
-        //    // Assert
-        //    result.IsSuccess.Should().BeTrue();
-        //    var results = result.ResultValue.SearchResults;
-        //    results.Count().Should().Be(4);
-        //    results.Contains("abcd").Should().BeTrue();
-        //    results.Contains("abef").Should().BeTrue();
-        //    results.Contains("acef").Should().BeTrue();
-        //    results.Contains("adef").Should().BeTrue();
-        //}
-
         [Test]
         public void should_get_approximate_size_of_trie()
         {
             // Arrange
-            var trie = new NonEmptyRootStringTrie(new DirectedAcyclicGraph<UnicodeCharacter>(new UnicodeCharacter('a')));
+            var trie = new NonEmptyRootStringTrie(new DirectedAcyclicGraph<UnicodeCharacter>(new UnicodeCharacter('a', false)), false);
 
             // Act
             var addResult1 = trie.AddIndex("abcd");

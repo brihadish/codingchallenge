@@ -4,11 +4,9 @@
     {
         EmptyIndexValue,
         EmptySearchValue,
-        IndexMismatch,
         IndexNotFound,
         IndexDataNotReadable,
         UnableToCreateNewIndex,
-        UnableToAddValueToIndex,
-        UnableToAcquireLockOnIndex
+        UnableToAddValueToIndex
     }
 }

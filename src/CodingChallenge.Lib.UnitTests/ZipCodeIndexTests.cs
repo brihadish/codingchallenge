@@ -20,9 +20,9 @@ namespace CodingChallenge.Lib.UnitTests
             var store = new Mock<ITrieDurableStore<string>>();
             store.Setup(t => t.GetTrieAsync(It.IsAny<string>())).Returns(
                 Task.FromResult(Result<ITrie<string>>.Failure(
-                    Error.CreateFromEnum(TrieFileStoreErrorType.TrieFileNotFound))));
-            var cache = new SimpleStringIndexCache(store.Object, 1024 * 1024, TimeSpan.FromMinutes(2));
-            var zipCodeIndex = new ZipCodeIndexer(new StringIndexer(cache));
+                    Error.CreateFromEnum(TrieStoreErrorType.TrieNotFound))));
+            var cache = new SimpleStringIndexCache(store.Object, 1024 * 1024, TimeSpan.FromMinutes(2), false);
+            var zipCodeIndex = new ZipCodeIndexer(new StringIndexer(cache, false));
 
             // Act
             var addResult1 = await zipCodeIndex.AddZipCodeAsync(453731);
@@ -50,9 +50,36 @@ namespace CodingChallenge.Lib.UnitTests
             var store = new Mock<ITrieDurableStore<string>>();
             store.Setup(t => t.GetTrieAsync(It.IsAny<string>())).Returns(
                 Task.FromResult(Result<ITrie<string>>.Failure(
-                    Error.CreateFromEnum(TrieFileStoreErrorType.TrieFileNotFound))));
-            var cache = new SimpleStringIndexCache(store.Object, 1024 * 1024, TimeSpan.FromMinutes(2));
-            var zipCodeIndex = new ZipCodeIndexer(new StringIndexer(cache));
+                    Error.CreateFromEnum(TrieStoreErrorType.TrieNotFound))));
+            var cache = new SimpleStringIndexCache(store.Object, 1024 * 1024, TimeSpan.FromMinutes(2), false);
+            var zipCodeIndex = new ZipCodeIndexer(new StringIndexer(cache, false));
+
+            // Act
+            var addResult1 = await zipCodeIndex.AddZipCodeAsync(453731);
+            var addResult2 = await zipCodeIndex.AddZipCodeAsync(453732);
+            var addResult3 = await zipCodeIndex.AddZipCodeAsync(453733);
+            var addResult4 = await zipCodeIndex.AddZipCodeAsync(453740);
+            var addResult5 = await zipCodeIndex.AddZipCodeAsync(453741);
+            var addResult6 = await zipCodeIndex.AddZipCodeAsync(453742);
+
+            var result = await zipCodeIndex.SearchAsync(new ZipCodeIndexSearchInput(45374, 2, null));
+
+            // Assert
+            result.IsSuccess.Should().BeTrue();
+            var results = result.ResultValue.SearchResults;
+            results.Count().Should().Be(2);
+            results.Contains(453740).Should().BeTrue();
+            results.Contains(453741).Should().BeTrue();
+            result.ResultValue.ContinuationToken.Should().NotBeNullOrWhiteSpace();
+        }
+
+        [Test]
+        public async Task should_add_and_retrieve_zipcode_index_3()
+        {
+            // Arrange
+            var store = new InMemoryTrieStore<string>();
+            var cache = new SimpleStringIndexCache(store, 1, TimeSpan.FromMinutes(2), false);
+            var zipCodeIndex = new ZipCodeIndexer(new StringIndexer(cache, false));
 
             // Act
             var addResult1 = await zipCodeIndex.AddZipCodeAsync(453731);

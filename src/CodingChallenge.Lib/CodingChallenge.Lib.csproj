@@ -67,7 +67,9 @@
     <Compile Include="Infrastructure\SimpleStringIndexCache.cs" />
     <Compile Include="Infrastructure\SimpleStringIndexCacheErrorType.cs" />
     <Compile Include="Infrastructure\TrieFileStore.cs" />
-    <Compile Include="Infrastructure\TrieFileStoreErrorType.cs" />
+    <Compile Include="Infrastructure\TrieStoreErrorType.cs" />
+    <Compile Include="Infrastructure\TrieStreamStore.cs" />
+    <Compile Include="Infrastructure\TrieStreamStoreErrorType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Result.cs" />
     <Compile Include="Domain\StringIndexerErrorType.cs" />

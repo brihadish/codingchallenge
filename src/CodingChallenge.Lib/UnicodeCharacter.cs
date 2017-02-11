@@ -8,16 +8,14 @@ namespace CodingChallenge.Lib
     [Serializable]
     public sealed class UnicodeCharacter : ValueObject<UnicodeCharacter>
     {
+        private readonly bool _isCaseSensitive;
+
         public char Value { get; }
 
-        public static UnicodeCharacter Empty()
-        {
-            return new UnicodeCharacter(' ');
-        }
-
-        public UnicodeCharacter(char value)
+        public UnicodeCharacter(char value, bool isCaseSensitive)
         {
             Value = value;
+            _isCaseSensitive = isCaseSensitive;
         }
 
         public UnicodeCharacter(byte[] valueInBytes)
@@ -38,30 +36,40 @@ namespace CodingChallenge.Lib
 
         protected override bool EqualsCore(UnicodeCharacter other)
         {
-            return string.Equals(
-                this.Value.ToString(), other.Value.ToString(), StringComparison.Ordinal);
-        }
-
-        public bool EqualsCharacter(char value)
-        {
-            return this.EqualsCore(new UnicodeCharacter(value));
+            if (_isCaseSensitive)
+            {
+                return string.Equals(
+                    this.Value.ToString(), other.Value.ToString(), StringComparison.Ordinal);
+            }
+            else
+            {
+                return string.Equals(
+                    this.Value.ToString(), other.Value.ToString(), StringComparison.OrdinalIgnoreCase);
+            }
         }
 
         protected override int GetHashCodeCore()
         {
-            return Value.GetHashCode();
+            if(_isCaseSensitive)
+            {
+                return Value.GetHashCode();
+            }
+            else
+            {
+                return Value.ToString().ToLowerInvariant().GetHashCode();
+            }
         }
     }
 
     internal static class UnicodeCharacterExtensions
     {
-        public static Maybe<UnicodeCharacter> FirstCharacter(this string value)
+        public static Maybe<UnicodeCharacter> FirstCharacter(this string value, bool isCaseSensitive)
         {
             if (string.IsNullOrWhiteSpace(value))
             {
                 return Maybe<UnicodeCharacter>.Nothing;
             }
-            return new UnicodeCharacter(value.First()).ToMaybe();
+            return new UnicodeCharacter(value.First(), isCaseSensitive).ToMaybe();
         }
     }
 }

@@ -3,7 +3,8 @@
     public enum SimpleStringIndexCacheErrorType
     {
         TrieNotFound,
-        UnableToParseTrie,
+        UnableToDeserializeTrie,
+        UnableToAccessTrie,
         UnableToAddToCache
     }
 }

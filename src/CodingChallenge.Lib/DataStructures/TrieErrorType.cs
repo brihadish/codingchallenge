@@ -5,6 +5,7 @@
         EmptyIndexValue,
         EmptySearchValue,
         IndexMismatch,
-        IndexNotFound
+        IndexNotFound,
+        UnableToAcquireLockOnIndex
     }
 }

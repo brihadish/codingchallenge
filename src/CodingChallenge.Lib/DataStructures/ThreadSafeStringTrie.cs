@@ -5,7 +5,7 @@ namespace CodingChallenge.Lib.DataStructures
 {
     internal sealed class ThreadSafeStringTrie : ITrie<string>
     {
-        private readonly ITrie<string> _trie;
+        internal readonly ITrie<string> _trie;
         private readonly ReaderWriterLockSlim _trieLock = 
             new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
         private readonly TimeSpan _lockAcquisitionTimeout;
@@ -26,18 +26,24 @@ namespace CodingChallenge.Lib.DataStructures
 
         public Result<bool> AddIndex(string indexValue)
         {
-            _trieLock.TryEnterWriteLock(_lockAcquisitionTimeout);
-            var result = _trie.AddIndex(indexValue);
-            _trieLock.EnterWriteLock();
-            return result;
+            if (_trieLock.TryEnterWriteLock(_lockAcquisitionTimeout))
+            {
+                var result = _trie.AddIndex(indexValue);
+                _trieLock.ExitWriteLock();
+                return result;
+            }
+            return Result<bool>.Failure(Error.CreateFromEnum(TrieErrorType.UnableToAcquireLockOnIndex));
         }
 
         public Result<TrieSearchOutput<string>> Search(TrieSearchInput<string> searchInput)
         {
-            _trieLock.TryEnterReadLock(_lockAcquisitionTimeout);
-            var result = _trie.Search(searchInput);
-            _trieLock.ExitReadLock();
-            return result;
+            if (_trieLock.TryEnterReadLock(_lockAcquisitionTimeout))
+            {
+                var result = _trie.Search(searchInput);
+                _trieLock.ExitReadLock();
+                return result;
+            }
+            return Result<TrieSearchOutput<string>>.Failure(Error.CreateFromEnum(TrieErrorType.UnableToAcquireLockOnIndex));
         }
     }
 }
