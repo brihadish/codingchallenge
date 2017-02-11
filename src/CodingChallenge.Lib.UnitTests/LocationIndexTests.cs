@@ -1,11 +1,12 @@
 ﻿using CodingChallenge.Lib.DataStructures;
 using CodingChallenge.Lib.Domain;
+using CodingChallenge.Lib.Infrastructure;
 using FluentAssertions;
+using Functional.Maybe;
+using Moq;
 using NUnit.Framework;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace CodingChallenge.Lib.UnitTests
@@ -14,20 +15,25 @@ namespace CodingChallenge.Lib.UnitTests
     public class LocationIndexTests
     {
         [Test]
-        public void should_add_and_retrieve_location_index_1()
+        public async Task should_add_and_retrieve_location_index_1()
         {
             // Arrange
-            var locationIndex = new LocationIndex(StringTrie.CreateNew('V', StringComparison.Ordinal));
+            var store = new Mock<ITrieDurableStore<string>>();
+            store.Setup(t => t.GetTrieAsync(It.IsAny<string>())).Returns(
+                Task.FromResult(Result<ITrie<string>>.Failure(
+                    Error.CreateFromEnum(TrieFileStoreErrorType.TrieFileNotFound))));
+            var cache = new SimpleStringIndexCache(store.Object, 1024 * 1024, TimeSpan.FromMinutes(2));
+            var locationIndex = new StringIndexer(cache);
 
             // Act
-            var addResult1 = locationIndex.AddLocation("Vändra");
-            var addResult2 = locationIndex.AddLocation("Vyukyula");
-            var addResult3 = locationIndex.AddLocation("Võtikvere");
-            var addResult4 = locationIndex.AddLocation("Võsupere");
-            var addResult5 = locationIndex.AddLocation("Võsu");
-            var addResult6 = locationIndex.AddLocation("Võsivere");
+            var addResult1 = await locationIndex.AddIndexAsync("Vändra");
+            var addResult2 = await locationIndex.AddIndexAsync("Vyukyula");
+            var addResult3 = await locationIndex.AddIndexAsync("Võtikvere");
+            var addResult4 = await locationIndex.AddIndexAsync("Võsupere");
+            var addResult5 = await locationIndex.AddIndexAsync("Võsu");
+            var addResult6 = await locationIndex.AddIndexAsync("Võsivere");
 
-            var result = locationIndex.Search(new LocationIndexSearchInput("Võ", 2, null));
+            var result = await locationIndex.SearchAsync(new StringIndexerSearchInput("Võ", 2.ToMaybe(), Maybe<string>.Nothing));
 
             // Assert
             result.IsSuccess.Should().BeTrue();
@@ -39,20 +45,25 @@ namespace CodingChallenge.Lib.UnitTests
         }
 
         [Test]
-        public void should_add_and_retrieve_location_index_2()
+        public async Task should_add_and_retrieve_location_index_2()
         {
             // Arrange
-            var locationIndex = new LocationIndex(StringTrie.CreateNew('V', StringComparison.Ordinal));
+            var store = new Mock<ITrieDurableStore<string>>();
+            store.Setup(t => t.GetTrieAsync(It.IsAny<string>())).Returns(
+                Task.FromResult(Result<ITrie<string>>.Failure(
+                    Error.CreateFromEnum(TrieFileStoreErrorType.TrieFileNotFound))));
+            var cache = new SimpleStringIndexCache(store.Object, 1024 * 1024, TimeSpan.FromMinutes(2));
+            var locationIndex = new StringIndexer(cache);
 
             // Act
-            var addResult1 = locationIndex.AddLocation("Vändra");
-            var addResult2 = locationIndex.AddLocation("Vyukyula");
-            var addResult3 = locationIndex.AddLocation("Võtikvere");
-            var addResult4 = locationIndex.AddLocation("Võsupere");
-            var addResult5 = locationIndex.AddLocation("Võsu");
-            var addResult6 = locationIndex.AddLocation("Võsivere");
+            var addResult1 = await locationIndex.AddIndexAsync("Vändra");
+            var addResult2 = await locationIndex.AddIndexAsync("Vyukyula");
+            var addResult3 = await locationIndex.AddIndexAsync("Võtikvere");
+            var addResult4 = await locationIndex.AddIndexAsync("Võsupere");
+            var addResult5 = await locationIndex.AddIndexAsync("Võsu");
+            var addResult6 = await locationIndex.AddIndexAsync("Võsivere");
 
-            var result = locationIndex.Search(new LocationIndexSearchInput("V", 2, null));
+            var result = await locationIndex.SearchAsync(new StringIndexerSearchInput("V", 2.ToMaybe(), Maybe<string>.Nothing));
 
             // Assert
             result.IsSuccess.Should().BeTrue();

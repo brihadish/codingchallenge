@@ -1,15 +1,21 @@
 ﻿using Functional.Maybe;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CodingChallenge.Lib.DataStructures.Graphs
 {
-    public sealed class DirectedAcyclicGraph<T> : IDirectedAcyclicGraph<T>
+    [Serializable]
+    public sealed class DirectedAcyclicGraph<T> : IDirectedAcyclicGraph<T> where T : ValueObject<T>
     {
         private readonly List<GraphVertex<T>> _graphAdjacencyList = new List<GraphVertex<T>>();
+
+        public long VertexCount
+        {
+            get
+            {
+                return _graphAdjacencyList.Count;
+            }
+        }
 
         internal IReadOnlyList<GraphVertex<T>> GraphAdjacencyList
         {
@@ -21,7 +27,7 @@ namespace CodingChallenge.Lib.DataStructures.Graphs
 
         public DirectedAcyclicGraph(T headNodeLabel)
         {
-            if(headNodeLabel.ToMaybe().HasValue == false)
+            if (headNodeLabel.ToMaybe().HasValue == false)
             {
                 throw new ArgumentNullException(nameof(headNodeLabel));
             }
@@ -35,11 +41,11 @@ namespace CodingChallenge.Lib.DataStructures.Graphs
 
         public void AddEdge(GraphNode<T> fromNode, GraphNode<T> toNode)
         {
-            if(fromNode.NodeIndex.HasValue == false)
+            if (fromNode.NodeIndex.HasValue == false)
             {
                 throw new ArgumentException(nameof(fromNode));
             }
-            if(fromNode.NodeIndex.Value >= _graphAdjacencyList.Count)
+            if (fromNode.NodeIndex.Value >= _graphAdjacencyList.Count)
             {
                 throw new ArgumentOutOfRangeException(nameof(fromNode));
             }

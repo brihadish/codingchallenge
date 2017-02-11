@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CodingChallenge.Lib.DataStructures.Graphs
 {
-    public interface IDirectedAcyclicGraphDepthFirstTraversor<T>
+    public interface IDirectedAcyclicGraphDepthFirstTraversor<T> where T : ValueObject<T>
     {
         GraphNode<T> Current { get; }
 

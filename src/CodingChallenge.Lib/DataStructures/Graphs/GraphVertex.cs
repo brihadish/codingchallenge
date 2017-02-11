@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CodingChallenge.Lib.DataStructures.Graphs
 {
@@ -36,12 +33,12 @@ namespace CodingChallenge.Lib.DataStructures.Graphs
 
         public bool AddAdjacentVertexIndex(T adjacentVertexLabel, int adjacentVertexIndex)
         {
-            if(_adjacentVertices.Any(t => t.Item1.Equals(adjacentVertexLabel)) == false)
+            if (_adjacentVertices.Any(t => t.Item1.Equals(adjacentVertexLabel)) == false)
             {
                 _adjacentVertices.Add(new Tuple<T, int>(adjacentVertexLabel, adjacentVertexIndex));
                 return true;
             }
             return false;
-        } 
+        }
     }
 }

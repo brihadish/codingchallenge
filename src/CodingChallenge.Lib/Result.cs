@@ -1,10 +1,6 @@
 ﻿using Functional.Maybe;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CodingChallenge.Lib
 {
@@ -22,7 +18,7 @@ namespace CodingChallenge.Lib
         {
             get
             {
-                if(IsSuccess)
+                if (IsSuccess)
                 {
                     throw new InvalidOperationException("There is no error for success scenario.");
                 }
@@ -32,7 +28,7 @@ namespace CodingChallenge.Lib
 
         public CommonResult(Maybe<Error> error)
         {
-            if(error.IsSomething())
+            if (error.IsSomething())
             {
                 _error = error.Value;
             }
@@ -90,7 +86,7 @@ namespace CodingChallenge.Lib
         {
             get
             {
-                if(IsFailure)
+                if (IsFailure)
                 {
                     throw new InvalidOperationException("There is no result value for failure scenario");
                 }

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CodingChallenge.Lib.DataStructures
+﻿namespace CodingChallenge.Lib.DataStructures
 {
     public interface ITrie<T>
     {

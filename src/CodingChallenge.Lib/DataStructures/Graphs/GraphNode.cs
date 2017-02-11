@@ -1,6 +1,5 @@
 ﻿using Functional.Maybe;
 using System;
-using System.Collections.Generic;
 
 namespace CodingChallenge.Lib.DataStructures.Graphs
 {
@@ -8,7 +7,7 @@ namespace CodingChallenge.Lib.DataStructures.Graphs
     {
         public Maybe<int> NodeIndex { get; }
 
-        public T NodeLabel { get; }        
+        public T NodeLabel { get; }
 
         public Maybe<bool> IsLeaf { get; }
 

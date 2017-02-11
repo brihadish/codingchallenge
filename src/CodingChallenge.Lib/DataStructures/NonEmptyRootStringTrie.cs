@@ -4,23 +4,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace CodingChallenge.Lib.DataStructures
 {
-    public sealed class StringTrie : ITrie<string>
+    [Serializable]
+    internal sealed class NonEmptyRootStringTrie : ITrie<string>
     {
-        private readonly IDirectedAcyclicGraph<char> _graph;
-
-        private readonly StringComparison _comparison;
-
-        internal DirectedAcyclicGraph<char> Graph
-        {
-            get
-            {
-                return _graph as DirectedAcyclicGraph<char>;
-            }
-        }
+        private readonly IDirectedAcyclicGraph<UnicodeCharacter> _graph;
 
         public long ApproximateSizeInBytes
         {
@@ -28,34 +18,45 @@ namespace CodingChallenge.Lib.DataStructures
             {
                 var vertexCharSize = 16;
                 var vertexIndexSize = 32;
-                return Graph.GraphAdjacencyList.Count * (vertexCharSize + vertexIndexSize);
+                return _graph.VertexCount * (vertexCharSize + vertexIndexSize);
             }
         }
 
-        internal StringTrie(IDirectedAcyclicGraph<char> graph, StringComparison comparison)
+        public NonEmptyRootStringTrie(IDirectedAcyclicGraph<UnicodeCharacter> graph)
         {
             if (graph == null)
             {
                 throw new ArgumentNullException(nameof(graph));
             }
             _graph = graph;
-            _comparison = comparison;
         }
 
-        public static StringTrie CreateNew(char startingChar, StringComparison comparison)
+        public static Result<NonEmptyRootStringTrie> CreateNew(string firstIndexValue)
         {
-            var graph = new DirectedAcyclicGraph<char>(startingChar);
-            return new StringTrie(graph, comparison);
+            var firstChar = firstIndexValue.FirstCharacter();
+            if (firstChar.IsNothing())
+            {
+                return Result<NonEmptyRootStringTrie>.Failure(Error.CreateFromEnum(TrieErrorType.EmptyIndexValue));
+            }
+
+            var graph = new DirectedAcyclicGraph<UnicodeCharacter>(firstChar.Value);
+            var trie = new NonEmptyRootStringTrie(graph);
+            return Result<NonEmptyRootStringTrie>.Ok(trie);
         }
 
         public Result<bool> AddIndex(string indexValue)
         {
+            if (string.IsNullOrWhiteSpace(indexValue))
+            {
+                return Result<bool>.Failure(Error.CreateFromEnum(TrieErrorType.EmptyIndexValue));
+            }
             var traversor = _graph.GetDepthFirstEnumerator();
             if (traversor.MoveNext())
             {
                 // Does the value's first character match the head vertex?
                 var firstCharInGraph = traversor.Current;
-                if (firstCharInGraph.NodeLabel.Equals(indexValue.First()) == false)
+                var firstCharInIndexValue = new UnicodeCharacter(indexValue.FirstOrDefault());
+                if (firstCharInGraph.NodeLabel.Equals(firstCharInIndexValue) == false)
                 {
                     return Result<bool>.Failure(Error.CreateFromEnum(TrieErrorType.IndexMismatch));
                 }
@@ -65,7 +66,8 @@ namespace CodingChallenge.Lib.DataStructures
             int index = 1; // Start from second character since the first one will be same as head vertex.
             for (; index < indexValueLength; index++)
             {
-                bool found = traversor.MoveNext(t => t.Equals(indexValue[index]));
+                var indexValueChar = new UnicodeCharacter(indexValue[index]);
+                bool found = traversor.MoveNext(t => t.Equals(indexValueChar));
                 if (found == false)
                 {
                     break;
@@ -77,8 +79,9 @@ namespace CodingChallenge.Lib.DataStructures
                 for (; index < indexValueLength; index++)
                 {
                     var current = traversor.Current;
-                    _graph.AddEdge(current, GraphNode<char>.CreateNew(indexValue[index]));
-                    traversor.MoveNext(t => t.Equals(indexValue[index]));
+                    var indexValueChar = new UnicodeCharacter(indexValue[index]);
+                    _graph.AddEdge(current, GraphNode<UnicodeCharacter>.CreateNew(indexValueChar));
+                    traversor.MoveNext(t => t.Equals(indexValueChar));
                 }
                 // Index has been added.
                 return Result<bool>.Ok(true);
@@ -99,7 +102,8 @@ namespace CodingChallenge.Lib.DataStructures
             {
                 // Does the value's first character match the head vertex?
                 var firstCharInGraph = traversor.Current;
-                if (firstCharInGraph.NodeLabel.Equals(searchValue.First()) == false)
+                var firstCharInSearchValue = new UnicodeCharacter(searchValue.FirstOrDefault());
+                if (firstCharInGraph.NodeLabel.Equals(firstCharInSearchValue) == false)
                 {
                     return Result<TrieSearchOutput<string>>.Failure(Error.CreateFromEnum(TrieErrorType.IndexMismatch));
                 }
@@ -110,7 +114,8 @@ namespace CodingChallenge.Lib.DataStructures
             int index = 1;// Start from second character since the first one will be same as head vertex.
             for (; index < searchValueLength; index++)
             {
-                bool found = traversor.MoveNext(t => t.Equals(searchValue[index]));
+                var searchValueChar = new UnicodeCharacter(searchValue[index]);
+                bool found = traversor.MoveNext(t => t.Equals(searchValueChar));
                 if (found == false)
                 {
                     break;
@@ -123,9 +128,9 @@ namespace CodingChallenge.Lib.DataStructures
             }
             else if (traversor.Current.IsLeaf.SelectOrElse(t => t, () => false))
             {
-                if(searchInput.ContinuationToken.IsSomething())
+                if (searchInput.ContinuationToken.IsSomething())
                 {
-                    if(string.Equals(searchInput.ContinuationToken.Value, searchValue, _comparison) == false)
+                    if (string.Equals(searchInput.ContinuationToken.Value, searchValue, StringComparison.Ordinal) == false)
                     {
                         // Reached end of traversal, hence return.
                         searchResults.Add(searchValue);
@@ -138,7 +143,7 @@ namespace CodingChallenge.Lib.DataStructures
                 var searchResultSize = 0;
                 var canAddToResultset = searchInput.ContinuationToken.IsNothing();
                 traversor.Checkpoint();
-                
+
                 while (traversor.MoveNext())
                 {
                     var current = traversor.Current;
@@ -146,22 +151,22 @@ namespace CodingChallenge.Lib.DataStructures
                     {
                         foreach (var node in traversor.CurrentPath)
                         {
-                            searchResult.Append(node.NodeLabel);
+                            searchResult.Append(node.NodeLabel.Value);
                         }
                         var searchResultValue = searchResult.ToString();
-                        if(canAddToResultset)
+                        if (canAddToResultset)
                         {
                             searchResults.Add(searchResultValue);
                             searchResultSize++;
                         }
                         else
                         {
-                            if(searchInput.ContinuationToken.Value.Equals(searchResultValue, _comparison))
+                            if (searchInput.ContinuationToken.Value.Equals(searchResultValue, StringComparison.Ordinal))
                             {
                                 canAddToResultset = true;
                             }
                         }
-                        if(searchInput.PageSize.SelectOrElse(t => t, () => int.MaxValue) == searchResultSize)
+                        if (searchInput.PageSize.SelectOrElse(t => t, () => int.MaxValue) == searchResultSize)
                         {
                             continuationToken = searchResultValue;
                             break;

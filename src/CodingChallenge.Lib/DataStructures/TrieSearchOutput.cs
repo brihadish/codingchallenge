@@ -1,20 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CodingChallenge.Lib.DataStructures
 {
-    [DataContract]
     public struct TrieSearchOutput<T>
     {
-        [DataMember]
-        public IEnumerable<T> SearchResults { get; private set; }
+        public IEnumerable<T> SearchResults { get; }
 
-        [DataMember]
-        public string ContinuationToken { get; private set; }
+        public string ContinuationToken { get; }
 
         public TrieSearchOutput(IEnumerable<T> searchResults, string continuationToken)
         {

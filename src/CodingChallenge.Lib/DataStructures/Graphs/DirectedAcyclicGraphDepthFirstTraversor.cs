@@ -1,14 +1,11 @@
 ﻿using Functional.Maybe;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CodingChallenge.Lib.DataStructures.Graphs
 {
-    public sealed class DirectedAcyclicGraphDepthFirstTraversor<T> : IDirectedAcyclicGraphDepthFirstTraversor<T>
+    public sealed class DirectedAcyclicGraphDepthFirstTraversor<T> : IDirectedAcyclicGraphDepthFirstTraversor<T> where T : ValueObject<T>
     {
         private int _currentIndex = -1;
         private Maybe<int> _checkpointedRootIndex;
@@ -20,7 +17,7 @@ namespace CodingChallenge.Lib.DataStructures.Graphs
 
         public DirectedAcyclicGraphDepthFirstTraversor(DirectedAcyclicGraph<T> graph)
         {
-            if(graph.GraphAdjacencyList.Count == 0)
+            if (graph.VertexCount == 0)
             {
                 throw new ArgumentNullException(nameof(graph));
             }
@@ -32,8 +29,8 @@ namespace CodingChallenge.Lib.DataStructures.Graphs
             get
             {
                 return new GraphNode<T>(
-                                _currentIndex, 
-                                _current.VertexLabel, 
+                                _currentIndex,
+                                _current.VertexLabel,
                                 _current.AdjacentVertices.Count == 0 ? true : false);
             }
         }
@@ -42,11 +39,11 @@ namespace CodingChallenge.Lib.DataStructures.Graphs
         {
             get
             {
-                foreach(var index in _previousIndexes.Reverse())
+                foreach (var index in _previousIndexes.Reverse())
                 {
                     yield return new GraphNode<T>(
-                        index, 
-                        _graph.GraphAdjacencyList[index].VertexLabel, 
+                        index,
+                        _graph.GraphAdjacencyList[index].VertexLabel,
                         _graph.GraphAdjacencyList[index].AdjacentVertices.Count == 0 ? true : false);
                 }
                 yield return new GraphNode<T>(
@@ -67,16 +64,16 @@ namespace CodingChallenge.Lib.DataStructures.Graphs
             else
             {
                 DetermineNextVertex();
-                if(_current.AdjacentVertices.Count == 0)
+                if (_current.AdjacentVertices.Count == 0)
                 {
                     return false;
                 }
 
-                foreach(var vertex in _current.AdjacentVertices)
+                foreach (var vertex in _current.AdjacentVertices)
                 {
                     if (adjacentVertexSelector != null)
                     {
-                        if(adjacentVertexSelector(vertex.Item1) == false)
+                        if (adjacentVertexSelector(vertex.Item1) == false)
                         {
                             continue;
                         }
@@ -96,7 +93,7 @@ namespace CodingChallenge.Lib.DataStructures.Graphs
                 _traversedIndexes.Add(_currentIndex);
             }
 
-            if(found)
+            if (found)
             {
                 _current = _graph.GraphAdjacencyList[_currentIndex];
             }
@@ -126,7 +123,7 @@ namespace CodingChallenge.Lib.DataStructures.Graphs
                 var index = _previousIndexes.Pop();
                 _current = _graph.GraphAdjacencyList[index];
                 _currentIndex = index;
-                if(_checkpointedRootIndex.SelectOrElse(t => t, () => -1) == index)
+                if (_checkpointedRootIndex.SelectOrElse(t => t, () => -1) == index)
                 {
                     return;
                 }

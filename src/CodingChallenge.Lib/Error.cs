@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CodingChallenge.Lib
 {
@@ -14,14 +10,14 @@ namespace CodingChallenge.Lib
         {
             ErrorType = errorType;
         }
-        
+
         public static Error CreateFromEnum<T>(T errorType)
         {
             try
             {
                 return new Error(Enum.GetName(typeof(T), errorType));
             }
-            catch(ArgumentException)
+            catch (ArgumentException)
             {
                 throw new ArgumentException(nameof(errorType));
             }
