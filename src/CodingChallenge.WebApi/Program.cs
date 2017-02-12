@@ -31,7 +31,7 @@ namespace CodingChallenge.WebApi
             {
                 using (WebApp.Start(baseAddress, builder => new Startup(fileInfo, directoryInfo).ConfigureApp(builder)))
                 {
-                    Console.WriteLine("Started CodingChallenge Web API...");
+                    Console.WriteLine("Started CodingChallenge Web API on base address [{0}]...", baseAddress);
                     Console.WriteLine("***********************Starting Test***************************");
                     Console.WriteLine();
                     Console.WriteLine();

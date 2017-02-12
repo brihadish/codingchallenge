@@ -12,7 +12,7 @@ namespace CodingChallenge.WebApi
         private readonly DirectoryInfo _rootDirectory;
         private readonly FileInfo _sampleDataFile;
 
-        private const int TrieCacheSizeInBytes = 100 * 1024 * 1024; // 100 KB
+        private const int TrieCacheSizeInBytes = 4 * 1024 * 1024; // 4 MB
         private readonly TimeSpan TrieCacheLockAcquisitionTimeout = TimeSpan.FromMinutes(1);
 
         private ITrieDurableStore<string> _trieStore;
